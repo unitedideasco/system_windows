@@ -61,7 +61,7 @@ class _MyAppState extends State<MyApp> {
             children: [
               Row(
                 children: [
-                  TweenAnimationBuilder(
+                  TweenAnimationBuilder<int>(
                     tween: IntTween(
                       begin: windowsToShow[index].previousActivityForce,
                       end: windowsToShow[index].activityForce,
@@ -75,7 +75,7 @@ class _MyAppState extends State<MyApp> {
                       ),
                     ),
                   ),
-                 TweenAnimationBuilder(
+                 TweenAnimationBuilder<int>(
                     tween: IntTween(
                       begin: windowsToShow[index].activityForce,
                       end: ticks - windowsToShow[index].activityForce,
