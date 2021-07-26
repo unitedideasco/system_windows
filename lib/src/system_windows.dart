@@ -17,10 +17,7 @@ class SystemWindows {
     final activeWindowsMap = jsonDecode(activeAppsJson!) as List;
 
     return activeWindowsMap
-        .map((windowMap) => SystemWindow(
-              name: windowMap['name'],
-              isActive: windowMap['isActive'],
-            ))
+        .map((windowMap) => SystemWindow.fromJson(windowMap))
         .toList();
   }
 }

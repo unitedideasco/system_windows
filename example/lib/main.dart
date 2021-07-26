@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -28,8 +30,9 @@ class _MyAppState extends State<MyApp> {
     Timer.periodic(const Duration(milliseconds: 1000), (timer) async {
       final activeApps = await systemWindows.getActiveApps();
 
-      final wl =
-          activeApps.map((w) => Window(w.name, w.isActive, 0, 0)).toList();
+      final wl = activeApps
+          .map((w) => Window(w.name, w.icon, w.isActive, 0, 0))
+          .toList();
 
       if (windowsToShow.isEmpty) {
         windowsToShow = wl;
@@ -61,6 +64,7 @@ class _MyAppState extends State<MyApp> {
             children: [
               Row(
                 children: [
+                  Image.memory(windowsToShow[index].icon),
                   TweenAnimationBuilder<int>(
                     tween: IntTween(
                       begin: windowsToShow[index].previousActivityForce,
@@ -75,7 +79,7 @@ class _MyAppState extends State<MyApp> {
                       ),
                     ),
                   ),
-                 TweenAnimationBuilder<int>(
+                  TweenAnimationBuilder<int>(
                     tween: IntTween(
                       begin: windowsToShow[index].activityForce,
                       end: ticks - windowsToShow[index].activityForce,
@@ -86,11 +90,13 @@ class _MyAppState extends State<MyApp> {
                       child: Container(
                         height: 30,
                       ),
-                   ),
+                    ),
                   ),
                 ],
               ),
-              Text(windowsToShow[index].name),
+              Padding(
+                  padding: EdgeInsets.only(left: 40.0),
+                  child: Text(windowsToShow[index].name)),
             ],
           ),
         ),
@@ -102,12 +108,14 @@ class _MyAppState extends State<MyApp> {
 class Window {
   Window(
     this.name,
+    this.icon,
     this.isActive,
     this.activityForce,
     this.previousActivityForce,
   );
 
   String name;
+  Uint8List icon;
   bool isActive;
   int activityForce;
   int previousActivityForce;
