@@ -27,9 +27,11 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _init() async {
+
     Timer.periodic(const Duration(milliseconds: 1000), (timer) async {
       final activeApps = await systemWindows.getActiveApps();
 
+      
       final wl = activeApps
           .map((w) => Window(w.name, w.icon, w.isActive, 0, 0))
           .toList();
@@ -48,7 +50,7 @@ class _MyAppState extends State<MyApp> {
         }
       }
       setState(() => ticks = ticks + 100);
-    });
+    }); 
   }
 
   @override
@@ -64,7 +66,7 @@ class _MyAppState extends State<MyApp> {
             children: [
               Row(
                 children: [
-                  Image.memory(windowsToShow[index].icon),
+                 // windowsToShow[index].icon.isNotEmpty ? Image.memory(windowsToShow[index].icon) :Container(),
                   TweenAnimationBuilder<int>(
                     tween: IntTween(
                       begin: windowsToShow[index].previousActivityForce,
