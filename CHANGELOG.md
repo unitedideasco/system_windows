@@ -1,3 +1,11 @@
+## 0.2.1
+
+* Update readme
+
+## 0.2.0
+
+* Initial release for all desktop platforms
+
 ## 0.1.3
 
 * Initial release for Linux
