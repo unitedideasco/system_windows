@@ -22,7 +22,7 @@ And that's it 🎉
 
 Check out the example to see how we built the app that measures what window is most used by user 🔥
 
-![alt text](./res/ss_1.png "Title")
+![Screenshot of the example](https://github.com/unitedideasco/system_windows/blob/main/res/ss_1.png?raw=true "system_windows_example")
 
 
 As simple as that. Feel free to contribute :)
