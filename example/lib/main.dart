@@ -54,49 +54,77 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-        ),
-        body: ListView.builder(
-          itemCount: windowsToShow.length,
-          itemBuilder: (context, index) => Stack(
+        body: Container(
+          margin: EdgeInsets.symmetric(horizontal: 50.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  Image.memory(windowsToShow[index].icon),
-                  TweenAnimationBuilder<int>(
-                    tween: IntTween(
-                      begin: windowsToShow[index].previousActivityForce,
-                      end: windowsToShow[index].activityForce,
-                    ),
-                    duration: Duration(milliseconds: 1000),
-                    builder: (context, value, widget) => Expanded(
-                      flex: value,
-                      child: Container(
-                        height: 30.0,
-                        color: Colors.red,
-                      ),
-                    ),
-                  ),
-                  TweenAnimationBuilder<int>(
-                    tween: IntTween(
-                      begin: windowsToShow[index].activityForce,
-                      end: ticks - windowsToShow[index].activityForce,
-                    ),
-                    duration: Duration(milliseconds: 1000),
-                    builder: (context, value, widget) => Expanded(
-                      flex: value,
-                      child: Container(
-                        height: 30,
-                      ),
-                    ),
-                  ),
-                ],
+              const SizedBox(height: 30.0),
+              Text(
+                'system_windows',
+                style: TextStyle(fontSize: 28.0),
               ),
-              Padding(
-                  padding: EdgeInsets.only(left: 40.0),
-                  child: Text(windowsToShow[index].name)),
+              const SizedBox(height: 20.0),
+              Text(
+                'This plugin allowes you to get data about opened apps on your desktop to do cool things just like the example below 🔥',
+                style: TextStyle(fontSize: 18.0, color: Colors.black54),
+              ),
+              const SizedBox(height: 30.0),
+              Expanded(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: windowsToShow.length,
+                  itemBuilder: (context, index) => Container(
+                    margin: EdgeInsets.only(bottom: 20.0),
+                    child: Stack(
+                      children: [
+                        Row(
+                          children: [
+                            Image.memory(windowsToShow[index].icon),
+                            const SizedBox(width: 12.0),
+                            TweenAnimationBuilder<int>(
+                              tween: IntTween(
+                                begin:
+                                    windowsToShow[index].previousActivityForce,
+                                end: windowsToShow[index].activityForce,
+                              ),
+                              duration: Duration(milliseconds: 1000),
+                              builder: (context, value, widget) => Expanded(
+                                flex: value,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.red,
+                                    borderRadius: BorderRadius.circular(4.0),
+                                  ),
+                                  height: 30.0,
+                                ),
+                              ),
+                            ),
+                            TweenAnimationBuilder<int>(
+                              tween: IntTween(
+                                begin: windowsToShow[index].activityForce,
+                                end: ticks - windowsToShow[index].activityForce,
+                              ),
+                              duration: Duration(milliseconds: 1000),
+                              builder: (context, value, widget) => Expanded(
+                                flex: value,
+                                child: Container(
+                                  height: 30,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Padding(
+                            padding: EdgeInsets.only(left: 55.0, top: 7.0),
+                            child: Text(windowsToShow[index].name)),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
