@@ -1,6 +1,6 @@
 name: system_windows
 description: Get opened windows and check which one of them is currently focused
-version: 0.1.1
+version: 0.1.3
 repository: https://github.com/unitedideasco/system_windows.git
 
 homepage: https://github.com/unitedideasco/
