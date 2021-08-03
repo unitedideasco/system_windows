@@ -14,11 +14,13 @@ class SystemWindows {
       'getActiveApps',
       <String, Object>{},
     );
+    print(activeAppsJson);
 
     final activeWindowsMap = jsonDecode(activeAppsJson!) as List;
 
     return activeWindowsMap
         .map((windowMap) => SystemWindow.fromJson(windowMap))
         .toList();
+        return [];
   }
 }
