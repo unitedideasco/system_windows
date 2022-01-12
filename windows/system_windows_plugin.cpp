@@ -286,10 +286,7 @@ void SystemWindowsPlugin::HandleMethodCall(
 
     int lastElement = static_cast<int>(windows.size()) - 1;
     for(int i= 0; i < windows.size(); i++) {
-       
-
-      std::cout<<"NAME: "<< windows[i].name << " | IS ACTIVE: " <<  windows[i].isActive <<std::endl;
-      
+             
 
       std::string currentWindow = "";
         if(i >= lastElement) { 
