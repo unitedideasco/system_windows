@@ -27,13 +27,11 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _init() async {
-
     Timer.periodic(const Duration(milliseconds: 1000), (timer) async {
       final activeApps = await systemWindows.getActiveApps();
 
-      
       final wl = activeApps
-          .map((w) => Window(w.name, w.icon, w.isActive, 0, 0))
+          .map((w) => Window(w.name, w.title, w.icon, w.isActive, 0, 0))
           .toList();
 
       if (windowsToShow.isEmpty) {
@@ -50,7 +48,7 @@ class _MyAppState extends State<MyApp> {
         }
       }
       setState(() => ticks = ticks + 100);
-    }); 
+    });
   }
 
   @override
@@ -120,8 +118,9 @@ class _MyAppState extends State<MyApp> {
                           ],
                         ),
                         Padding(
-                            padding: EdgeInsets.only(left: 55.0, top: 7.0),
-                            child: Text(windowsToShow[index].name)),
+                          padding: EdgeInsets.only(left: 55.0, top: 7.0),
+                          child: Text(windowsToShow[index].name),
+                        ),
                       ],
                     ),
                   ),
@@ -138,6 +137,7 @@ class _MyAppState extends State<MyApp> {
 class Window {
   Window(
     this.name,
+    this.title,
     this.icon,
     this.isActive,
     this.activityForce,
@@ -145,6 +145,7 @@ class Window {
   );
 
   String name;
+  String title;
   Uint8List icon;
   bool isActive;
   int activityForce;
