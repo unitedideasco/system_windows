@@ -23,11 +23,30 @@ public class SystemWindowsPlugin: NSObject, FlutterPlugin {
         var windows = Array<SystemWindow>()
         let ws = NSWorkspace.shared
         let apps = ws.runningApplications
-    
+        
+
+        
+        
         for currentApp in apps {
             if(currentApp.activationPolicy == .regular){
+                
+                var title = ""
+                
+                let visibleWindows = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID) as! [[String: Any]]
+                   
+                
+                for window in visibleWindows {
+                    let windowOwnerPID = window[kCGWindowOwnerPID as String] as! pid_t
+                    
+                    if(windowOwnerPID == currentApp.processIdentifier) {
+                        title =  window[kCGWindowName as String] as? String ?? ""
+                    }
+                    
+                    print(window[kCGWindowName as String] as! String  + " \(windowOwnerPID)")
+                }
+                
                 let systemWindow = SystemWindow(
-                    name: currentApp.localizedName!, isActive: currentApp.isActive, icon: currentApp.icon!.base64String!);
+                    name: currentApp.localizedName!,title: title, isActive: currentApp.isActive, icon: currentApp.icon!.base64String!);
 
                 windows.append(systemWindow)
             }
@@ -48,8 +67,8 @@ public class SystemWindowsPlugin: NSObject, FlutterPlugin {
 
 
 struct SystemWindow: Codable {
-    
     var name : String;
+    var title : String;
     var isActive : Bool;
     var icon : String
 }

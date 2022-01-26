@@ -13,6 +13,7 @@ class SystemWindows {
       'getActiveApps',
       <String, Object>{},
     );
+    print(activeAppsJson);
 
     final activeWindowsMap = jsonDecode(activeAppsJson!) as List;
 

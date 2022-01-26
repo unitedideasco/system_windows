@@ -8,11 +8,18 @@ import 'dart:typed_data';
 /// Definition of system window
 class SystemWindow {
   /// Creates a system window with the given properties.
-  SystemWindow(
-      {required this.name, required this.isActive, required this.icon});
+  SystemWindow({
+    required this.name,
+    required this.title,
+    required this.isActive,
+    required this.icon,
+  });
 
   /// Name that identifies the system window
   final String name;
+
+  /// Title of the window
+  final String title;
 
   /// Is app focused
   final bool isActive;
@@ -23,6 +30,7 @@ class SystemWindow {
   factory SystemWindow.fromJson(Map<String, dynamic> json) {
     return SystemWindow(
       name: json['name'],
+      title: json['windowTitle'],
       isActive: json['isActive'],
       icon: Base64Decoder().convert(json['icon']),
     );
@@ -31,6 +39,7 @@ class SystemWindow {
   Map<String, String> serialize() {
     return <String, String>{
       "name": this.name,
+      "title": this.title,
       "isActive": this.isActive.toString(),
       "icon": Base64Encoder().convert(this.icon),
     };
@@ -41,6 +50,7 @@ class SystemWindow {
       identical(this, other) ||
       other is SystemWindow &&
           name == other.name &&
+          title == other.title &&
           isActive == other.isActive &&
           icon == other.icon;
 
