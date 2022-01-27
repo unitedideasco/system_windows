@@ -22,6 +22,16 @@
 
 #pragma comment(lib,"gdiplus.lib")
 
+
+
+typedef struct
+{
+    DWORD ownerpid;
+    DWORD childpid;
+} windowinfo;
+
+
+
 struct SystemWindow {
     std::string name;
     std::string title;
@@ -135,23 +145,32 @@ SystemWindowsPlugin::~SystemWindowsPlugin() {}
 
 
 
+BOOL CALLBACK EnumChildWindowsCallback(HWND hWnd, LPARAM lp) {
+    windowinfo* info = (windowinfo*)lp;
+    DWORD pid = 0;
+    GetWindowThreadProcessId(hWnd, &pid);
+    if (pid != info->ownerpid) info->childpid = pid;
+    return TRUE;
+}
+
 
 BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam) {
   DWORD tid, pid;
   const DWORD TITLE_SIZE = 1024;
 
-  WCHAR windowName[TITLE_SIZE];
+  //WCHAR windowName[TITLE_SIZE];
   WCHAR windowTitle[TITLE_SIZE];
 
   GetWindowTextW(hwnd, windowTitle, TITLE_SIZE);
 
   int length = ::GetWindowTextLength(hwnd);
-
-  std::wstring name(&windowName[0]);
+  
+  TCHAR szProcessName[MAX_PATH] = TEXT("<unknown>");
+  //std::wstring name(&windowName[0]);
   std::wstring title(&windowTitle[0]);
 
 
-  if (!IsWindowVisible(hwnd) || length == 0 || title == L"Program Manager") {
+  if (!IsWindowVisible(hwnd) || length == 0) {
       return TRUE;
   }
 
@@ -160,7 +179,6 @@ BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam) {
   
   tid = GetWindowThreadProcessId(hwnd, &pid);
   
-  TCHAR szProcessName[MAX_PATH] = TEXT("<unknown>");
 
 
   int cTxtLen;
@@ -175,17 +193,18 @@ BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam) {
       if (EnumProcessModules( hProcess, &hMod, sizeof(hMod), &cbNeeded)) {
           GetModuleBaseName( hProcess, hMod, szProcessName,sizeof(szProcessName)/sizeof(TCHAR) );
 
-          GetModuleBaseNameW( hProcess, hMod, windowName,sizeof(windowName)/sizeof(WCHAR)  );
+
+          //GetModuleBaseNameW( hProcess, hMod, windowName,sizeof(windowName)/sizeof(WCHAR)  );
 
           cTxtLen = GetWindowTextLength(hwnd);
-          GetWindowText(hwnd, pszMem,cTxtLen + 1);
+          GetWindowTextW(hwnd, windowTitle,sizeof(windowTitle)/sizeof(WCHAR));
       }
   }
 
   CloseHandle( hProcess );
 
   bool isActive = temp == hwnd;
- // std::string name = TCHAR2STRING(szProcessName) ; 
+  std::string name = TCHAR2STRING(szProcessName) ; 
   std::string winTitle = TCHAR2STRING(pszMem) ;  
 
 
@@ -194,20 +213,45 @@ BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam) {
   using convert_type = std::codecvt_utf8<wchar_t>;
   std::wstring_convert<convert_type, wchar_t> converter;
 
-  std::string string_name = converter.to_bytes( name );
+  //std::string string_name = converter.to_bytes( name );
   std::string string_title = converter.to_bytes( title );
 
 
   SystemWindow window;
-  
-  window.name = string_name;
+
+
+
+  if(name == "ApplicationFrameHost.exe"  && isActive) {
+
+    windowinfo info = { 0 };
+    GetWindowThreadProcessId(temp, &info.ownerpid);
+    info.childpid = info.ownerpid;
+    EnumChildWindows(temp, EnumChildWindowsCallback, (LPARAM)&info);
+    HANDLE active_process = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, info.childpid);
+    WCHAR image_name[MAX_PATH] = { 0 };
+    DWORD bufsize = MAX_PATH;
+    QueryFullProcessImageName(active_process, 0, image_name, &bufsize);
+
+
+    std::wstring string(image_name);
+    std::string  image_name_string =  converter.to_bytes( string );
+    std::string base_filename = image_name_string.substr(image_name_string.find_last_of("\\") + 1);
+
+    name = base_filename;
+
+    CloseHandle(active_process);
+  }
+
+  window.name = name;
   window.isActive = isActive;
   window.icon = "";
   window.title = string_title;
 
   std::vector<SystemWindow>& windows =
                               *reinterpret_cast<std::vector<SystemWindow>*>(lParam);
+  
   windows.push_back(window);
+  
 	return TRUE;
 }
 
@@ -244,6 +288,7 @@ void SystemWindowsPlugin::HandleMethodCall(
       }
     }
 
+    std::cout << windows_json << std::endl;
 
     result->Success(flutter::EncodableValue(windows_json));
   } else {

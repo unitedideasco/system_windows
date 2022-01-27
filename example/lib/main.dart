@@ -119,14 +119,16 @@ class _MyAppState extends State<MyApp> {
                           ],
                         ),
                         Padding(
-                          padding: EdgeInsets.only(left: 55.0, top: 5.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                            Text("Name: "+ windowsToShow[index].title ?? ""),
-                            Text("Title: "+ windowsToShow[index].name ?? ""),
-                          ],) 
-                        ),
+                            padding: EdgeInsets.only(left: 55.0, top: 5.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                    "Name: " + windowsToShow[index].name ?? ""),
+                                Text("Title: " + windowsToShow[index].title ??
+                                    ""),
+                              ],
+                            )),
                       ],
                     ),
                   ),
