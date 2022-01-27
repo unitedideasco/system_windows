@@ -13,9 +13,10 @@ class SystemWindows {
       'getActiveApps',
       <String, Object>{},
     );
-    print(activeAppsJson);
 
-    final activeWindowsMap = jsonDecode(activeAppsJson!) as List;
+    // I don't know why there are a lof of 쳌 chars. This is just bad workaround.
+    final cleanActiveAppsJson = activeAppsJson?.replaceAll('쳌', '');
+    final activeWindowsMap = jsonDecode(cleanActiveAppsJson!) as List;
 
     return activeWindowsMap
         .map((windowMap) => SystemWindow.fromJson(windowMap))

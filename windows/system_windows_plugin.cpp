@@ -1,43 +1,35 @@
 #pragma warning(disable:4458)
 #pragma warning(disable:4312)
 #pragma warning(disable:5046)
-
-
+#pragma warning(disable:4996)
 
 #include "include/system_windows/system_windows_plugin.h"
-
-// This must be included before many other Windows headers.
 #include <windows.h>
-
-// For getPlatformVersion; remove unless needed for your plugin implementation.
 #include <VersionHelpers.h>
-
 #include <flutter/method_channel.h>
 #include <flutter/plugin_registrar_windows.h>
 #include <flutter/standard_method_codec.h>
-
 #include <map>
 #include <memory>
 #include <sstream>
-
 #include <stdio.h>
 #include <tchar.h>
 #include <psapi.h>
 #include <winuser.h>
 #include <gdiplus.h>
+#include <locale>  
+#include <codecvt>
+
 #pragma comment(lib,"gdiplus.lib")
 
 struct SystemWindow {
     std::string name;
+    std::string title;
     bool isActive;
     std::string icon;
 };
 
-
 namespace {
-
-
-
 
 class SystemWindowsPlugin : public flutter::Plugin {
  public:
@@ -48,7 +40,6 @@ class SystemWindowsPlugin : public flutter::Plugin {
   virtual ~SystemWindowsPlugin();
 
  private:
-  // Called when a method is called on this plugin's channel from Dart.
   void HandleMethodCall(
       const flutter::MethodCall<flutter::EncodableValue> &method_call,
       std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result);
@@ -65,71 +56,7 @@ static const std::string base64_chars =
              "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
              "abcdefghijklmnopqrstuvwxyz"
              "0123456789+/";
-/* 
-static BITMAP_AND_BYTES createAlphaChannelBitmapFromIcon(HICON hIcon) {
-    // Get the icon info
-    ICONINFO iconInfo = {0};
-    GetIconInfo(hIcon, &iconInfo);
 
-    // Get the screen DC
-    HDC dc = GetDC(NULL);
-
-    // Get icon size info
-    BITMAP bm = {0};
-    GetObject( iconInfo.hbmColor, sizeof( BITMAP ), &bm );
-
-    // Set up BITMAPINFO
-    BITMAPINFO bmi = {0};
-    bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-    bmi.bmiHeader.biWidth = bm.bmWidth;
-    bmi.bmiHeader.biHeight = -bm.bmHeight;
-    bmi.bmiHeader.biPlanes = 1;
-    bmi.bmiHeader.biBitCount = 32;
-    bmi.bmiHeader.biCompression = BI_RGB;
-
-    // Extract the color bitmap
-    int nBits = bm.bmWidth * bm.bmHeight;
-    int32_t* colorBits = new int32_t[nBits];
-    GetDIBits(dc, iconInfo.hbmColor, 0, bm.bmHeight, colorBits, &bmi, DIB_RGB_COLORS);
-
-    // Check whether the color bitmap has an alpha channel.
-        // (On my Windows 7, all file icons I tried have an alpha channel.)
-    BOOL hasAlpha = FALSE;
-    for (int i = 0; i < nBits; i++) {
-        if ((colorBits[i] & 0xff000000) != 0) {
-            hasAlpha = TRUE;
-            break;
-        }
-    }
-
-    // If no alpha values available, apply the mask bitmap
-    if (!hasAlpha) {
-        // Extract the mask bitmap
-        int32_t* maskBits = new int32_t[nBits];
-        GetDIBits(dc, iconInfo.hbmMask, 0, bm.bmHeight, maskBits, &bmi, DIB_RGB_COLORS);
-        // Copy the mask alphas into the color bits
-        for (int i = 0; i < nBits; i++) {
-            if (maskBits[i] == 0) {
-                colorBits[i] |= 0xff000000;
-            }
-        }
-        delete[] maskBits;
-    } 
-
-    // Release DC and GDI bitmaps
-    ReleaseDC(NULL, dc); 
-    ::DeleteObject(iconInfo.hbmColor);
-    ::DeleteObject(iconInfo.hbmMask); 
-
-    // Create GDI+ Bitmap
-    Gdiplus::Bitmap* bmp = new Gdiplus::Bitmap(bm.bmWidth, bm.bmHeight, bm.bmWidth*4, PixelFormat32bppARGB, (BYTE*)colorBits);
-    BITMAP_AND_BYTES ret = {bmp, colorBits};
-
-    return ret;
-}
-
-
- */
 std::string TCHAR2STRING(TCHAR *STR) {
 	int iLen = WideCharToMultiByte(CP_ACP, 0, STR, -1, NULL, 0, NULL, NULL);
 	char* chRtn = new char[iLen*sizeof(char)];
@@ -212,12 +139,17 @@ SystemWindowsPlugin::~SystemWindowsPlugin() {}
 BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam) {
   DWORD tid, pid;
   const DWORD TITLE_SIZE = 1024;
+
+  WCHAR windowName[TITLE_SIZE];
   WCHAR windowTitle[TITLE_SIZE];
 
   GetWindowTextW(hwnd, windowTitle, TITLE_SIZE);
 
   int length = ::GetWindowTextLength(hwnd);
+
+  std::wstring name(&windowName[0]);
   std::wstring title(&windowTitle[0]);
+
 
   if (!IsWindowVisible(hwnd) || length == 0 || title == L"Program Manager") {
       return TRUE;
@@ -229,6 +161,11 @@ BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam) {
   tid = GetWindowThreadProcessId(hwnd, &pid);
   
   TCHAR szProcessName[MAX_PATH] = TEXT("<unknown>");
+
+
+  int cTxtLen;
+  LPTSTR pszMem = new TCHAR[1000];
+
   HANDLE hProcess = OpenProcess( PROCESS_ALL_ACCESS | PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid );
 
   if (NULL != hProcess ) {
@@ -237,30 +174,36 @@ BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam) {
 
       if (EnumProcessModules( hProcess, &hMod, sizeof(hMod), &cbNeeded)) {
           GetModuleBaseName( hProcess, hMod, szProcessName,sizeof(szProcessName)/sizeof(TCHAR) );
+
+          GetModuleBaseNameW( hProcess, hMod, windowName,sizeof(windowName)/sizeof(WCHAR)  );
+
+          cTxtLen = GetWindowTextLength(hwnd);
+          GetWindowText(hwnd, pszMem,cTxtLen + 1);
       }
   }
 
   CloseHandle( hProcess );
 
-
-/*   std::vector<std::wstring>& titles =
-                              *reinterpret_cast<std::vector<std::wstring>*>(lParam);
-  titles.push_back(title); */
-
   bool isActive = temp == hwnd;
-  std::string name = TCHAR2STRING(szProcessName) ;  
+ // std::string name = TCHAR2STRING(szProcessName) ; 
+  std::string winTitle = TCHAR2STRING(pszMem) ;  
 
 
-  //HICON hIcon=(HICON)GetClassLong(hwnd,-14);
+  //create wstring to string converter
+  std::wstring string_to_convert;
+  using convert_type = std::codecvt_utf8<wchar_t>;
+  std::wstring_convert<convert_type, wchar_t> converter;
+
+  std::string string_name = converter.to_bytes( name );
+  std::string string_title = converter.to_bytes( title );
 
 
-
-  //std::string base64_icon = base64_encode(&bytes[0], bytes.size());
   SystemWindow window;
   
-  window.name = name;
+  window.name = string_name;
   window.isActive = isActive;
   window.icon = "";
+  window.title = string_title;
 
   std::vector<SystemWindow>& windows =
                               *reinterpret_cast<std::vector<SystemWindow>*>(lParam);
@@ -290,9 +233,9 @@ void SystemWindowsPlugin::HandleMethodCall(
 
       std::string currentWindow = "";
         if(i >= lastElement) { 
-          currentWindow = "{\"name\": \"" + windows[i].name + "\", \"isActive\": "+BoolToString(windows[i].isActive) +", \"icon\": \"\"}";
+          currentWindow = "{\"name\": \"" + windows[i].name + "\", \"title\": \"" + windows[i].title + "\", \"isActive\": "+BoolToString(windows[i].isActive) +", \"icon\": \"\"}";
         } else {
-          currentWindow = "{\"name\": \"" + windows[i].name + "\", \"isActive\": "+BoolToString(windows[i].isActive) +", \"icon\": \"\"},";
+          currentWindow = "{\"name\": \"" + windows[i].name + "\", \"title\": \""+ windows[i].title + "\", \"isActive\": "+BoolToString(windows[i].isActive) +", \"icon\": \"\"},";
         }
 
       windows_json = windows_json + currentWindow;
@@ -300,6 +243,8 @@ void SystemWindowsPlugin::HandleMethodCall(
         windows_json = windows_json + " ]";
       }
     }
+
+
     result->Success(flutter::EncodableValue(windows_json));
   } else {
     result->NotImplemented();
@@ -314,3 +259,10 @@ void SystemWindowsPluginRegisterWithRegistrar(
       flutter::PluginRegistrarManager::GetInstance()
           ->GetRegistrar<flutter::PluginRegistrarWindows>(registrar));
 }
+
+
+
+
+
+
+

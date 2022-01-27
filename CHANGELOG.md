@@ -1,23 +1,23 @@
 ## 0.2.1
 
-* Update readme
+- Update readme
 
 ## 0.2.0
 
-* Initial release for all desktop platforms
+- Initial release for all desktop platforms
 
 ## 0.1.3
 
-* Initial release for Linux
+- Initial release for Linux
 
 ## 0.1.2
 
-* Initial release for Windows
+- Initial release for Windows
 
 ## 0.1.1
 
-* Add icon parameter to SystemWindow (MacOS only)
+- Add icon parameter to SystemWindow (MacOS only)
 
 ## 0.0.1
 
-* Initial release for MacOs
+- Initial release for MacOs
