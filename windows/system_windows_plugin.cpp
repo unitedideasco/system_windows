@@ -288,7 +288,6 @@ void SystemWindowsPlugin::HandleMethodCall(
       }
     }
 
-    std::cout << windows_json << std::endl;
 
     result->Success(flutter::EncodableValue(windows_json));
   } else {
