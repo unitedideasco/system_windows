@@ -30,7 +30,7 @@ class SystemWindow {
   factory SystemWindow.fromJson(Map<String, dynamic> json) {
     return SystemWindow(
       name: json['name'],
-      title: json['windowTitle'],
+      title: json['title'],
       isActive: json['isActive'],
       icon: Base64Decoder().convert(json['icon']),
     );

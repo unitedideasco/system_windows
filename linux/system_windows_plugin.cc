@@ -35,6 +35,7 @@ G_DEFINE_TYPE(SystemWindowsPlugin, system_windows_plugin, g_object_get_type())
 
 struct SystemWindow {
     std::string name;
+    std::string title;
     bool isActive;
     std::string icon;
 };
@@ -84,17 +85,6 @@ static void system_windows_plugin_handle_method_call(
       index = index+11;
     }
 
-
-    for(int i=0; i < window_ids.size(); i++) {
-
-      std::cout<< window_ids[i] << "\n";
-
-    }
-    
-
-  
-
-
     std::vector<SystemWindow> system_windows;
     SystemWindow system_window;
 
@@ -123,12 +113,27 @@ static void system_windows_plugin_handle_method_call(
         std::string x_prop_active_command = "xprop -id " + hex + " | grep '_NET_WM_STATE_FOCUSED'";
         std::string xprop_active_result = exec(x_prop_active_command.c_str());
 
+        std::string x_prop_title_command = "xwininfo -frame -id " + hex + " | grep 'xwininfo'";
+        std::string xprop_title_result = exec(x_prop_title_command.c_str());
+
+        
+        std::string window_title = "";
+
+        for(int j = 32; j < xprop_title_result.length()-2; j++) {
+          window_title = window_title + xprop_title_result[j];
+        }
+
+        system_window.title = window_title;
 
         system_window.name = app_name;
         system_window.isActive = xprop_active_result != "";
+        
+        /*
         std::cout << " - - - - - - - - - - - - - - - - - - \n";
         std::cout << "App name: " <<  system_window.name << "\n";
+        std::cout << "Window title: " << system_window.title << "\n";
         std::cout << "Is focused: " << BoolToString(system_window.isActive)   << "\n";
+        */
 
         system_windows.push_back(system_window); 
       
@@ -146,15 +151,16 @@ static void system_windows_plugin_handle_method_call(
       
       std::string currentWindow = "";
         if(i >= lastElement) { 
-          currentWindow = "{\"name\": " + system_windows[i].name + "\", \"isActive\": "+BoolToString(system_windows[i].isActive) +", \"icon\": \"\"}";
+          currentWindow = "{\"name\": " + system_windows[i].name + "\", \"title\": \"" + system_windows[i].title + " \", \"isActive\": "+BoolToString(system_windows[i].isActive) +", \"icon\": \"\"}";
         } else {
-          currentWindow = "{\"name\": " + system_windows[i].name + "\", \"isActive\": "+BoolToString(system_windows[i].isActive) +", \"icon\": \"\"},";
+          currentWindow = "{\"name\": " + system_windows[i].name + "\", \"title\": \"" + system_windows[i].title + " \", \"isActive\": "+BoolToString(system_windows[i].isActive) +", \"icon\": \"\"},";
         }
 
       windows_json = windows_json + currentWindow;
       if(i >= lastElement) {
         windows_json = windows_json + " ]";
       }
+
     } 
       
 

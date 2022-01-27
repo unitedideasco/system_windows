@@ -99,7 +99,7 @@ class _MyAppState extends State<MyApp> {
                                     color: Colors.red,
                                     borderRadius: BorderRadius.circular(4.0),
                                   ),
-                                  height: 30.0,
+                                  height: 40.0,
                                 ),
                               ),
                             ),
@@ -112,15 +112,20 @@ class _MyAppState extends State<MyApp> {
                               builder: (context, value, widget) => Expanded(
                                 flex: value,
                                 child: Container(
-                                  height: 30,
+                                  height: 40,
                                 ),
                               ),
                             ),
                           ],
                         ),
                         Padding(
-                          padding: EdgeInsets.only(left: 55.0, top: 7.0),
-                          child: Text(windowsToShow[index].name),
+                          padding: EdgeInsets.only(left: 55.0, top: 5.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                            Text("Name: "+ windowsToShow[index].title ?? ""),
+                            Text("Title: "+ windowsToShow[index].name ?? ""),
+                          ],) 
                         ),
                       ],
                     ),
