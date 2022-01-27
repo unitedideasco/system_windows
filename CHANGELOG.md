@@ -1,3 +1,8 @@
+## 0.3.0
+
+- Add window title
+- Replace ApplicationFrameHost.exe with real process name
+
 ## 0.2.1
 
 - Update readme
