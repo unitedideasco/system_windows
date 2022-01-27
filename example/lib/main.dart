@@ -82,7 +82,8 @@ class _MyAppState extends State<MyApp> {
                       children: [
                         Row(
                           children: [
-                            Image.memory(windowsToShow[index].icon),
+                            if (windowsToShow[index].icon.isNotEmpty)
+                              Image.memory(windowsToShow[index].icon),
                             const SizedBox(width: 12.0),
                             TweenAnimationBuilder<int>(
                               tween: IntTween(
