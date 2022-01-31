@@ -41,8 +41,6 @@ public class SystemWindowsPlugin: NSObject, FlutterPlugin {
                     if(windowOwnerPID == currentApp.processIdentifier) {
                         title =  window[kCGWindowName as String] as? String ?? ""
                     }
-                    
-                    print(window[kCGWindowName as String] as! String  + " \(windowOwnerPID)")
                 }
                 
                 let systemWindow = SystemWindow(
