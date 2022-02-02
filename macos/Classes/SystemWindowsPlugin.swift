@@ -1,6 +1,6 @@
 import Cocoa
 import FlutterMacOS
-
+import AppKit
 
 public class SystemWindowsPlugin: NSObject, FlutterPlugin {
 
@@ -14,6 +14,8 @@ public class SystemWindowsPlugin: NSObject, FlutterPlugin {
         switch call.method {
             case "getActiveApps":
                 result(getActiveApps())
+            case "hasScreenRecordingPermission":
+                result(hasScreenRecordingPermission())
             default:
                 result(FlutterMethodNotImplemented)
         }
@@ -23,8 +25,6 @@ public class SystemWindowsPlugin: NSObject, FlutterPlugin {
         var windows = Array<SystemWindow>()
         let ws = NSWorkspace.shared
         let apps = ws.runningApplications
-        
-
         
         
         for currentApp in apps {
@@ -60,6 +60,18 @@ public class SystemWindowsPlugin: NSObject, FlutterPlugin {
 
 
         return "";
+    }
+    
+    func hasScreenRecordingPermission() -> Bool {
+        CGDisplayStream(
+            dispatchQueueDisplay: CGMainDisplayID(),
+            outputWidth: 1,
+            outputHeight: 1,
+            pixelFormat: Int32(kCVPixelFormatType_32BGRA),
+            properties: nil,
+            queue: DispatchQueue.global(),
+            handler: { _, _, _, _ in }
+        ) != nil
     }
 }
 

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -20,6 +21,8 @@ class _MyAppState extends State<MyApp> {
   var windowsToShow = List<Window>.empty();
   var ticks = 0;
 
+  var hasScreenRecordingPermissions = false;
+
   @override
   void initState() {
     super.initState();
@@ -29,6 +32,9 @@ class _MyAppState extends State<MyApp> {
   void _init() async {
     Timer.periodic(const Duration(milliseconds: 1000), (timer) async {
       final activeApps = await systemWindows.getActiveApps();
+
+      hasScreenRecordingPermissions =
+          await systemWindows.hasScreenRecordingPermission();
 
       final wl = activeApps
           .map((w) => Window(w.name, w.title, w.icon, w.isActive, 0, 0))
@@ -72,6 +78,12 @@ class _MyAppState extends State<MyApp> {
                 style: TextStyle(fontSize: 18.0, color: Colors.black54),
               ),
               const SizedBox(height: 30.0),
+              if (Platform.isMacOS) ...[
+                Text(
+                  'Has screen recording permissions: $hasScreenRecordingPermissions',
+                ),
+                const SizedBox(height: 30.0),
+              ],
               Expanded(
                 child: ListView.builder(
                   shrinkWrap: true,

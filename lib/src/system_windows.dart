@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/services.dart';
 import '../system_windows.dart';
@@ -21,5 +22,19 @@ class SystemWindows {
     return activeWindowsMap
         .map((windowMap) => SystemWindow.fromJson(windowMap))
         .toList();
+  }
+
+  Future<bool> hasScreenRecordingPermission() async {
+    if (Platform.isMacOS) {
+      final hasScreenRecordingPermission = await _channel.invokeMethod<bool>(
+        'hasScreenRecordingPermission',
+        <String, Object>{},
+      );
+
+      return hasScreenRecordingPermission ?? false;
+    } else {
+      throw UnimplementedError(
+          'hasScreenRecordingPermission() is only supported on MacOS');
+    }
   }
 }
