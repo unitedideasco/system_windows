@@ -1,9 +1,8 @@
 import 'dart:io';
 import 'dart:typed_data';
-
-import 'package:flutter/material.dart';
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:system_windows/system_windows.dart';
 
 void main() {
@@ -33,8 +32,12 @@ class _MyAppState extends State<MyApp> {
     Timer.periodic(const Duration(milliseconds: 1000), (timer) async {
       final activeApps = await systemWindows.getActiveApps();
 
-      hasScreenRecordingPermissions =
-          await systemWindows.hasScreenRecordingPermission();
+      if (Platform.isMacOS) {
+        hasScreenRecordingPermissions =
+            await systemWindows.hasScreenRecordingPermission();
+      } else {
+        hasScreenRecordingPermissions = true;
+      }
 
       final wl = activeApps
           .map((w) => Window(w.name, w.title, w.icon, w.isActive, 0, 0))
