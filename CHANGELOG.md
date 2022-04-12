@@ -2,6 +2,8 @@
 
 - Add window title
 - Replace ApplicationFrameHost.exe with real process name
+- Avoid escape sequences ([#2](https://github.com/unitedideasco/system_windows/issues/2))
+- Call permission check only on MacOS in example
 
 ## 0.2.1
 
