@@ -2,9 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:convert';
-import 'dart:typed_data';
-
 /// Definition of system window
 class SystemWindow {
   /// Creates a system window with the given properties.
@@ -12,7 +9,6 @@ class SystemWindow {
     required this.name,
     required this.title,
     required this.isActive,
-    required this.icon,
   });
 
   /// Name that identifies the system window
@@ -24,15 +20,11 @@ class SystemWindow {
   /// Is app focused
   final bool isActive;
 
-  /// App icon represented by Uint8List
-  final Uint8List icon;
-
   factory SystemWindow.fromJson(Map<String, dynamic> json) {
     return SystemWindow(
       name: json['name'],
       title: json['title'],
       isActive: json['isActive'],
-      icon: Base64Decoder().convert(json['icon']),
     );
   }
 
@@ -41,7 +33,6 @@ class SystemWindow {
       "name": this.name,
       "title": this.title,
       "isActive": this.isActive.toString(),
-      "icon": Base64Encoder().convert(this.icon),
     };
   }
 
@@ -51,14 +42,13 @@ class SystemWindow {
       other is SystemWindow &&
           name == other.name &&
           title == other.title &&
-          isActive == other.isActive &&
-          icon == other.icon;
+          isActive == other.isActive;
 
   @override
-  int get hashCode => name.hashCode ^ isActive.hashCode ^ icon.hashCode;
+  int get hashCode => name.hashCode ^ title.hashCode ^ isActive.hashCode;
 
   @override
   String toString() {
-    return '$runtimeType($name, $isActive, $icon)';
+    return '$runtimeType($name, $title, $isActive)';
   }
 }

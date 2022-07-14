@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -40,7 +39,7 @@ class _MyAppState extends State<MyApp> {
       }
 
       final wl = activeApps
-          .map((w) => Window(w.name, w.title, w.icon, w.isActive, 0, 0))
+          .map((w) => Window(w.name, w.title, w.isActive, 0, 0))
           .toList();
 
       if (windowsToShow.isEmpty) {
@@ -97,9 +96,6 @@ class _MyAppState extends State<MyApp> {
                       children: [
                         Row(
                           children: [
-                            if (windowsToShow[index].icon.isNotEmpty)
-                              Image.memory(windowsToShow[index].icon),
-                            const SizedBox(width: 12.0),
                             TweenAnimationBuilder<int>(
                               tween: IntTween(
                                 begin:
@@ -161,7 +157,6 @@ class Window {
   Window(
     this.name,
     this.title,
-    this.icon,
     this.isActive,
     this.activityForce,
     this.previousActivityForce,
@@ -169,7 +164,6 @@ class Window {
 
   String name;
   String title;
-  Uint8List icon;
   bool isActive;
   int activityForce;
   int previousActivityForce;
