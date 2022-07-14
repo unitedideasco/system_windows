@@ -1,3 +1,7 @@
+### 0.3.1
+
+- Remove icon from the scope of the project
+
 ## 0.3.0
 
 - Add window title
@@ -5,7 +9,7 @@
 - Avoid escape sequences ([#2](https://github.com/unitedideasco/system_windows/issues/2))
 - Call permission check only on MacOS in example
 
-## 0.2.1
+### 0.2.1
 
 - Update readme
 
@@ -13,15 +17,15 @@
 
 - Initial release for all desktop platforms
 
-## 0.1.3
+### 0.1.3
 
 - Initial release for Linux
 
-## 0.1.2
+### 0.1.2
 
 - Initial release for Windows
 
-## 0.1.1
+### 0.1.1
 
 - Add icon parameter to SystemWindow (MacOS only)
 
