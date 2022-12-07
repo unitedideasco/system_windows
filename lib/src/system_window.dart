@@ -2,11 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-/// {@template system_window}
-/// Class containing info about single window opened in system
-/// {@endtemplate}
+import 'dart:convert';
+import 'dart:typed_data';
+
+/// Definition of system window
 class SystemWindow {
-  /// {@macro system window}
+  /// Creates a system window with the given properties.
   SystemWindow({
     required this.name,
     required this.title,

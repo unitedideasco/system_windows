@@ -16,8 +16,28 @@ class SystemWindows {
     );
 
     // I don't know why there are a lof of 쳌 chars. This is just bad workaround.
-    final cleanActiveAppsJson = activeAppsJson?.replaceAll('쳌', '');
-    final activeWindowsMap = jsonDecode(cleanActiveAppsJson!) as List;
+    var cleanActiveAppsJson = activeAppsJson?.replaceAll('쳌', '');
+
+    final jsonParts = cleanActiveAppsJson!.split('');
+
+    var correctJson = '';
+
+    for (var i = 0; i < jsonParts.length; i++) {
+      final currentChar = jsonParts[i];
+
+      if (currentChar == r'\') {
+        final nextChar = jsonParts[i + 1];
+        final isNextCharEscapable = nextChar == r'n' || nextChar == r'"';
+
+        if (!isNextCharEscapable) {
+          correctJson += currentChar + r'\';
+          continue;
+        }
+      }
+      correctJson += currentChar;
+    }
+
+    final activeWindowsMap = jsonDecode(correctJson) as List;
 
     return activeWindowsMap
         .map((windowMap) => SystemWindow.fromJson(windowMap))
