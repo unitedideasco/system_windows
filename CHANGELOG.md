@@ -1,3 +1,7 @@
+### 0.3.2
+
+- Remove MacOS implementation of icon
+
 ### 0.3.1
 
 - Remove icon from the scope of the project
