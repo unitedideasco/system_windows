@@ -3,7 +3,8 @@ import FlutterMacOS
 import AppKit
 
 public class SystemWindowsPlugin: NSObject, FlutterPlugin {
-
+    
+    
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "unitedideas.co/system_windows", binaryMessenger: registrar.messenger)
         let instance = SystemWindowsPlugin()
@@ -22,6 +23,7 @@ public class SystemWindowsPlugin: NSObject, FlutterPlugin {
     }
 
     private func getActiveApps() -> String {
+
         var windows = Array<SystemWindow>()
         let ws = NSWorkspace.shared
         let apps = ws.runningApplications
@@ -34,7 +36,6 @@ public class SystemWindowsPlugin: NSObject, FlutterPlugin {
                 
                 let visibleWindows = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID) as! [[String: Any]]
                    
-                
                 for window in visibleWindows {
                     let windowOwnerPID = window[kCGWindowOwnerPID as String] as! pid_t
                     
@@ -44,7 +45,10 @@ public class SystemWindowsPlugin: NSObject, FlutterPlugin {
                 }
                 
                 let systemWindow = SystemWindow(
-                    name: currentApp.localizedName!,title: title, isActive: currentApp.isActive, icon: currentApp.icon!.base64String!);
+                    name: currentApp.localizedName!,
+                    title: title,
+                    isActive: currentApp.isActive
+                );
 
                 windows.append(systemWindow)
             }
@@ -57,7 +61,6 @@ public class SystemWindowsPlugin: NSObject, FlutterPlugin {
 
             return jsonString
         } catch { print(error) }
-
 
         return "";
     }
@@ -75,49 +78,8 @@ public class SystemWindowsPlugin: NSObject, FlutterPlugin {
     }
 }
 
-
 struct SystemWindow: Codable {
     var name : String;
     var title : String;
     var isActive : Bool;
-    var icon : String
 }
-
-
-
-
-extension NSImage {
-    var base64String: String? {
-        guard let rep = NSBitmapImageRep(
-            bitmapDataPlanes: nil,
-            pixelsWide: Int(size.width),
-            pixelsHigh: Int(size.height),
-            bitsPerSample: 16,
-            samplesPerPixel: 4,
-            hasAlpha: true,
-            isPlanar: false,
-            colorSpaceName: .calibratedRGB,
-            bytesPerRow: 0,
-            bitsPerPixel: 0
-            ) else {
-                print("Couldn't create bitmap representation")
-                return nil
-        }
-
-        NSGraphicsContext.saveGraphicsState()
-        NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: rep)
-        draw(at: NSZeroPoint, from: NSZeroRect, operation: .sourceOver, fraction: 1.0)
-        NSGraphicsContext.restoreGraphicsState()
-
-        guard let data = rep.representation(using: NSBitmapImageRep.FileType.png, properties: [NSBitmapImageRep.PropertyKey.compressionFactor: 1.0]) else {
-            print("Couldn't create PNG")
-            return nil
-        }
-
-        // With prefix
-        // return "data:image/png;base64,\(data.base64EncodedString(options: []))"
-        // Without prefix
-        return data.base64EncodedString(options: [])
-    }
-}
-
